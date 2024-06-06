@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: "sonar-metrics"
+  description: "sonar-metrics"
+  annotations:
+    gitlab.com/project-slug: kingfadzi/sonar-metrics
+    backstage.io/techdocs-ref: dir:.
+    gitlab.com/jobs: 'Deploy:DEFAULT_JOB,Start:START_JOB,Stop:STOP_JOB'
+    backstage.io/kubernetes-id: "sonar-metrics"  # Ensuring Kubernetes resources are linked
+spec:
+  type: service
+  lifecycle: experimental
+  owner: "group:default/kingfadzi"
