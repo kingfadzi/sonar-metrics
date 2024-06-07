@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
+import java.util.Map;
+import java.util.TreeMap;
 
 @RestController
 @RequestMapping("/sonarqube")
@@ -51,23 +53,27 @@ public class SonarQubeController {
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonResponse);
             JsonNode measures = jsonNode.path("component").path("measures");
-            StringWriter writer = new StringWriter();
+            TreeMap<String, String> sortedMetrics = new TreeMap<>(); // TreeMap to sort keys automatically
 
-            StringBuilder headers = new StringBuilder();
-            StringBuilder values = new StringBuilder();
-
-            boolean first = true;
             for (JsonNode measure : measures) {
-                if (!first) {
-                    headers.append(",");
-                    values.append(",");
-                }
-                headers.append(measure.path("metric").asText());
-                values.append(measure.path("value").asText());
-                first = false;
+                String metric = measure.path("metric").asText();
+                String value = measure.path("value").asText();
+                sortedMetrics.put(metric, value); // Adding to TreeMap
             }
 
-            writer.append(headers.toString()).append("\n").append(values.toString()).append("\n");
+            StringWriter writer = new StringWriter();
+            // Write headers
+            for (String key : sortedMetrics.keySet()) {
+                writer.append(key).append(",");
+            }
+            writer.replace(writer.length() - 1, writer.length(), "\n"); // Replace last comma with newline
+
+            // Write values
+            for (String value : sortedMetrics.values()) {
+                writer.append(value).append(",");
+            }
+            writer.replace(writer.length() - 1, writer.length(), "\n"); // Replace last comma with newline
+
             return writer.toString();
         } catch (Exception e) {
             LOGGER.error("Error converting JSON to CSV", e);
