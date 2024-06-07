@@ -11,5 +11,6 @@ curl -s "http://localhost:8080/sonarqube/measures?componentKey=PROJECT_KEY&metri
 fkat file
 
 ```
-jq -r '.component.measures | map({(.metric): .value}) | add | [keys_unsorted[], values[]] | @csv' input.json > output.csv
+jq -r '.component.measures | (map(.metric) | join(",")), (map(.value) | join(","))' input.json > output.csv
+
 ```
